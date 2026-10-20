@@ -45,6 +45,7 @@ final class SearchPanel: NSPanel {
         let top = visible.maxY - visible.height * 0.2
         let frame = NSRect(x: visible.midX - Self.width / 2, y: top - height, width: Self.width, height: height)
         setFrame(frame.integral, display: true)
+        invalidateShadow()
     }
 
     func resize(height: CGFloat) {
@@ -53,6 +54,7 @@ final class SearchPanel: NSPanel {
         frame.origin.y += frame.height - height
         frame.size.height = height
         setFrame(frame, display: true)
+        invalidateShadow()
     }
 
     static func screenWithMouse() -> NSScreen? {

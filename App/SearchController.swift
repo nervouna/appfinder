@@ -53,6 +53,7 @@ import QuartzCore
     private(set) var lastClose: [String: Any] = [:]
     private(set) var lockCorrections = 0
     private(set) var lastFileSearch: [String: Any] = [:]
+    private let undoManager = UndoManager()
 
     static let fieldHeight: CGFloat = 56
     static let rowHeight: CGFloat = 44
@@ -88,6 +89,12 @@ import QuartzCore
         let glass = NSGlassEffectView()
         glass.cornerRadius = 18
         glass.contentView = content
+        // Clipped to its rounded shape, so that the window's shadow follows the corners; without
+        // the clip the window server draws the shadow, and a hard rim, around the whole rectangle.
+        glass.wantsLayer = true
+        glass.layer?.cornerRadius = 18
+        glass.layer?.cornerCurve = .continuous
+        glass.layer?.masksToBounds = true
         panel.contentView = glass
         panel.delegate = self
         panel.keyHandler = { [weak self] event in
@@ -105,7 +112,9 @@ import QuartzCore
         table.addTableColumn(column)
         table.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
         table.headerView = nil
-        table.style = .inset
+        // Plain, so that the rows are exactly as tall as they say and the list height can be
+        // computed; ResultRowView draws the rounded selection that the inset style would.
+        table.style = .plain
         table.backgroundColor = .clear
         table.selectionHighlightStyle = .regular
         table.intercellSpacing = NSSize(width: 0, height: 0)
@@ -117,7 +126,6 @@ import QuartzCore
         table.doubleAction = #selector(doubleClicked)
         scroll.documentView = table
         scroll.drawsBackground = false
-        scroll.hasVerticalScroller = true
         scroll.autohidesScrollers = true
         scroll.scrollerStyle = .overlay
         scroll.automaticallyAdjustsContentInsets = false
@@ -140,9 +148,15 @@ import QuartzCore
         panel.alphaValue = 1
     }
 
+    /// The height of all rows; the list grows with it up to `maxListHeight`, and only scrolls beyond.
+    private var contentHeight: CGFloat {
+        rows.reduce(0) { $0 + ($1.item == nil ? Self.headerHeight : Self.rowHeight) }
+    }
+
+    private static let maxListHeight = rowHeight * visibleItemRows + headerHeight
+
     private var listHeight: CGFloat {
-        let total = rows.reduce(0) { $0 + ($1.item == nil ? Self.headerHeight : Self.rowHeight) }
-        return min(total, Self.rowHeight * Self.visibleItemRows + Self.headerHeight)
+        min(contentHeight, Self.maxListHeight)
     }
 
     private var panelHeight: CGFloat {
@@ -158,6 +172,7 @@ import QuartzCore
         scroll.isHidden = rows.isEmpty
         separator.frame = NSRect(x: 0, y: Self.fieldHeight, width: width, height: 1)
         scroll.frame = NSRect(x: 0, y: Self.fieldHeight + 1 + 6, width: width, height: listHeight)
+        scroll.hasVerticalScroller = contentHeight > Self.maxListHeight
         table.sizeLastColumnToFit()
     }
 
@@ -180,6 +195,7 @@ import QuartzCore
         guard !isOpen else { return }
         let started = CACurrentMediaTime()
         isOpen = true
+        undoManager.removeAllActions()
         var marks: [String: Double] = [:]
         func mark(_ name: String) { marks[name] = (CACurrentMediaTime() - started) * 1000 }
         field.stringValue = ""
@@ -304,6 +320,9 @@ import QuartzCore
             return false
         }
         let flags = event.modifierFlags.intersection([.command, .option, .control, .shift])
+        if flags.contains(.command), editKeyEquivalent(event, flags: flags) {
+            return true
+        }
         switch Int(event.keyCode) {
         case kVK_Escape:
             close(.escape)
@@ -321,6 +340,22 @@ import QuartzCore
             break
         default:
             return false
+        }
+        return true
+    }
+
+    /// The Edit menu's shortcuts for the search field. AppFinder is never the active app while the
+    /// panel is up, so there is no menu bar to carry them.
+    private func editKeyEquivalent(_ event: NSEvent, flags: NSEvent.ModifierFlags) -> Bool {
+        guard let editor = field.currentEditor() as? NSTextView else { return false }
+        switch (event.charactersIgnoringModifiers?.lowercased(), flags) {
+        case ("a", .command): editor.selectAll(nil)
+        case ("c", .command): editor.copy(nil)
+        case ("x", .command): editor.cut(nil)
+        case ("v", .command): editor.paste(nil)
+        case ("z", .command): editor.undoManager?.undo()
+        case ("z", [.command, .shift]): editor.undoManager?.redo()
+        default: return false
         }
         return true
     }
@@ -505,6 +540,8 @@ import QuartzCore
             "key": panel.isKeyWindow,
             "appActive": NSApp.isActive,
             "query": field.stringValue,
+            "selectedText": (field.currentEditor()?.selectedRange).map { NSStringFromRange($0) } ?? NSNull(),
+            "listScrolls": scroll.hasVerticalScroller,
             "selected": selectedItem?.item.path ?? NSNull(),
             "rows": rows.map { row -> [String: Any] in
                 switch row {
@@ -538,6 +575,11 @@ extension SearchController: NSTextFieldDelegate {
 }
 
 extension SearchController: NSWindowDelegate {
+    /// The panel has no undo manager of its own; the search field's edits need one for Cmd+Z.
+    func windowWillReturnUndoManager(_ window: NSWindow) -> UndoManager? {
+        undoManager
+    }
+
     func windowDidResignKey(_ notification: Notification) {
         // Another window took the focus (a click elsewhere, Cmd+Tab): the panel goes away.
         guard isOpen, !isClosing else { return }
@@ -554,16 +596,12 @@ extension SearchController: NSTableViewDataSource, NSTableViewDelegate {
         rows[row].item == nil ? Self.headerHeight : Self.rowHeight
     }
 
-    func tableView(_ tableView: NSTableView, isGroupRow row: Int) -> Bool {
-        rows[row].item == nil
-    }
-
     func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
         rows[row].item != nil
     }
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
-        EmphasizedRowView()
+        ResultRowView()
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
@@ -582,12 +620,20 @@ extension SearchController: NSTableViewDataSource, NSTableViewDelegate {
     }
 }
 
-/// Draws the selection in the accent colour although the table never has the keyboard focus
-/// (the search field keeps it).
-final class EmphasizedRowView: NSTableRowView {
+/// Draws the selection as a rounded rectangle inset from the panel's edges, in the accent colour
+/// although the table never has the keyboard focus (the search field keeps it).
+final class ResultRowView: NSTableRowView {
+    static let inset: CGFloat = 8
+
     override var isEmphasized: Bool {
         get { true }
         set {}
+    }
+
+    override func drawSelection(in dirtyRect: NSRect) {
+        guard selectionHighlightStyle != .none else { return }
+        NSColor.selectedContentBackgroundColor.setFill()
+        NSBezierPath(roundedRect: bounds.insetBy(dx: Self.inset, dy: 1), xRadius: 8, yRadius: 8).fill()
     }
 }
 

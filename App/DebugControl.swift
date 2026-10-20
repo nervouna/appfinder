@@ -65,6 +65,27 @@ import AppKit
             "panel.probe": { _ in
                 onMain { done in done(app.search.debugProbe()) }
             },
+            // Sends a key press through NSApp.sendEvent, as the window server's event would arrive:
+            // {keyCode, command?, shift?}.
+            "panel.key": { params in
+                guard let code = params["keyCode"] as? Int else { throw ControlFailure("params: {keyCode, command?, shift?}") }
+                let command = params["command"] as? Bool ?? false
+                let shift = params["shift"] as? Bool ?? false
+                return onMain { done in
+                    let source = CGEventSource(stateID: .privateState)
+                    for down in [true, false] {
+                        guard let cgEvent = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(code), keyDown: down) else { continue }
+                        var flags: CGEventFlags = []
+                        if command { flags.insert(.maskCommand) }
+                        if shift { flags.insert(.maskShift) }
+                        cgEvent.flags = flags
+                        if let event = NSEvent(cgEvent: cgEvent) {
+                            NSApp.sendEvent(event)
+                        }
+                    }
+                    DispatchQueue.main.async { done(app.search.debugState()) }
+                }
+            },
             "inputSource.current": { _ in
                 onMain { done in done(["id": (TISInputSources().currentID() as Any?) ?? NSNull()]) }
             },

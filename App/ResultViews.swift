@@ -63,14 +63,14 @@ final class ResultCellView: NSTableCellView {
             addSubview(view)
         }
         NSLayoutConstraint.activate([
-            icon.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+            icon.leadingAnchor.constraint(equalTo: leadingAnchor, constant: ResultRowView.inset + 10),
             icon.centerYAnchor.constraint(equalTo: centerYAnchor),
             icon.widthAnchor.constraint(equalToConstant: 30),
             icon.heightAnchor.constraint(equalToConstant: 30),
             text.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 10),
             text.centerYAnchor.constraint(equalTo: centerYAnchor),
             kind.leadingAnchor.constraint(greaterThanOrEqualTo: text.trailingAnchor, constant: 12),
-            kind.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            kind.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -(ResultRowView.inset + 12)),
             kind.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
     }
@@ -133,7 +133,7 @@ final class HeaderCellView: NSTableCellView {
         label.translatesAutoresizingMaskIntoConstraints = false
         addSubview(label)
         NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: ResultRowView.inset + 10),
             label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -3),
         ])
     }
