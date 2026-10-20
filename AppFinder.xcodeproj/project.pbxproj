@@ -1,0 +1,461 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 90;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000140 /* AppFinderCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000170 /* AppFinderCore */; };
+		A10000000000000000000150 /* AppFinderSystem in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000180 /* AppFinderSystem */; };
+		B10000000000000000000140 /* AppFinderControl in Frameworks */ = {isa = PBXBuildFile; productRef = B10000000000000000000170 /* AppFinderControl */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A10000000000000000000030 /* AppFinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10000000000000000000030 /* AppFinderFixture.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppFinderFixture.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A10000000000000000000010 /* App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = App;
+			sourceTree = "<group>";
+		};
+		B10000000000000000000010 /* Fixture */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Fixture;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A10000000000000000000120 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				A10000000000000000000140 /* AppFinderCore in Frameworks */,
+				A10000000000000000000150 /* AppFinderSystem in Frameworks */,
+			);
+		};
+		B10000000000000000000120 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				B10000000000000000000140 /* AppFinderControl in Frameworks */,
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A10000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000010 /* App */,
+				B10000000000000000000010 /* Fixture */,
+				A10000000000000000000020 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000000000000000000020 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000030 /* AppFinder.app */,
+				B10000000000000000000030 /* AppFinderFixture.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000000000000000000100 /* AppFinder */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000300 /* Build configuration list for PBXNativeTarget "AppFinder" */;
+			buildPhases = (
+				A10000000000000000000110 /* Sources */,
+				A10000000000000000000120 /* Frameworks */,
+				A10000000000000000000130 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A10000000000000000000195 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000010 /* App */,
+			);
+			name = AppFinder;
+			packageProductDependencies = (
+				A10000000000000000000170 /* AppFinderCore */,
+				A10000000000000000000180 /* AppFinderSystem */,
+			);
+			productName = AppFinder;
+			productReference = A10000000000000000000030 /* AppFinder.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B10000000000000000000100 /* AppFinderFixture */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B10000000000000000000300 /* Build configuration list for PBXNativeTarget "AppFinderFixture" */;
+			buildPhases = (
+				B10000000000000000000110 /* Sources */,
+				B10000000000000000000120 /* Frameworks */,
+				B10000000000000000000130 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B10000000000000000000010 /* Fixture */,
+			);
+			name = AppFinderFixture;
+			packageProductDependencies = (
+				B10000000000000000000170 /* AppFinderControl */,
+			);
+			productName = AppFinderFixture;
+			productReference = B10000000000000000000030 /* AppFinderFixture.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000000000000000000000 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					A10000000000000000000100 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					B10000000000000000000100 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = A10000000000000000000200 /* Build configuration list for PBXProject "AppFinder" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = A10000000000000000000001;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A10000000000000000000160 /* XCLocalSwiftPackageReference "." */,
+			);
+			preferredProjectObjectVersion = 90;
+			productRefGroup = A10000000000000000000020 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000000000000000000100 /* AppFinder */,
+				B10000000000000000000100 /* AppFinderFixture */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A10000000000000000000130 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		B10000000000000000000130 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10000000000000000000110 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		B10000000000000000000110 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A10000000000000000000195 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A10000000000000000000190 /* AppFinderControl */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A10000000000000000000210 /* Debug configuration for PBXProject "AppFinder" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		A10000000000000000000220 /* Release configuration for PBXProject "AppFinder" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		A10000000000000000000310 /* Debug configuration for PBXNativeTarget "AppFinder" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = AppFinder;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)/AppFinderControl.o",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.damao.appfinder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Debug;
+		};
+		A10000000000000000000320 /* Release configuration for PBXNativeTarget "AppFinder" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = AppFinder;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.damao.appfinder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Release;
+		};
+		B10000000000000000000310 /* Debug configuration for PBXNativeTarget "AppFinderFixture" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFinder Fixture";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.damao.appfinder.fixture;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Debug;
+		};
+		B10000000000000000000320 /* Release configuration for PBXNativeTarget "AppFinderFixture" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFinder Fixture";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.damao.appfinder.fixture;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000000000000000000200 /* Build configuration list for PBXProject "AppFinder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000210 /* Debug configuration for PBXProject "AppFinder" */,
+				A10000000000000000000220 /* Release configuration for PBXProject "AppFinder" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000300 /* Build configuration list for PBXNativeTarget "AppFinder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000310 /* Debug configuration for PBXNativeTarget "AppFinder" */,
+				A10000000000000000000320 /* Release configuration for PBXNativeTarget "AppFinder" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		B10000000000000000000300 /* Build configuration list for PBXNativeTarget "AppFinderFixture" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B10000000000000000000310 /* Debug configuration for PBXNativeTarget "AppFinderFixture" */,
+				B10000000000000000000320 /* Release configuration for PBXNativeTarget "AppFinderFixture" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A10000000000000000000160 /* XCLocalSwiftPackageReference "." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = .;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A10000000000000000000170 /* AppFinderCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFinderCore;
+		};
+		A10000000000000000000180 /* AppFinderSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFinderSystem;
+		};
+		A10000000000000000000190 /* AppFinderControl */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFinderControl;
+		};
+		B10000000000000000000170 /* AppFinderControl */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFinderControl;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A10000000000000000000000 /* Project object */;
+}
