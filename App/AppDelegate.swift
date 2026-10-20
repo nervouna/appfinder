@@ -27,6 +27,9 @@ import os
         )
         catalog.start()
         hotkeys.registerSaved()
+        // Spotlight leaves out files in Desktop, Documents and Downloads until AppFinder may read
+        // them; reading them once makes the system ask (once).
+        settings.checkFolders()
         #if !DEBUG
         offerLoginItemOnce()
         #endif

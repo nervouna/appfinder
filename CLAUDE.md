@@ -36,6 +36,10 @@ This is the reason AppFinder exists; change it only with the check below. Measur
 - Close by a click elsewhere: the focus has already moved. The system's per-document switching does not restore InkFlow reliably (AppFinder never becomes the active app, so ABC can get recorded for the document behind the panel), and selecting the source after the focus moved can leave the menu bar on InkFlow while keys still go to ABC (the known CJK issue, reproduced once in five). So the panel takes the key focus back for a moment, invisibly, selects the source, waits `Tuning.refocusSettle` and lets go (macism's workaround). Checked with real clicks.
 - Keys typed while the panel is closing are swallowed (typically 30 to 80 ms).
 
+## Protected folders
+
+Spotlight leaves files in Desktop, Documents and Downloads out of AppFinder's results until the user allowed AppFinder to access each folder (`mdfind` in a terminal still finds them). `FolderAccess.check()` reads the three folders at launch, off the main thread, which makes the system ask once; Settings shows whether access is allowed and links to Privacy & Security. Never reset or edit TCC.
+
 ## Build, sign, run
 
 - `swift test` runs the unit tests.

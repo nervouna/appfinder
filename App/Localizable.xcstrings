@@ -35,6 +35,23 @@
         }
       }
     },
+    "Allowed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowed"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许"
+          }
+        }
+      }
+    },
     "AppFinder Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -86,6 +103,23 @@
         }
       }
     },
+    "Desktop, Documents and Downloads": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desktop, Documents and Downloads"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "桌面、文稿和下载"
+          }
+        }
+      }
+    },
     "Files": {
       "extractionState": "manual",
       "localizations": {
@@ -99,6 +133,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "文件"
+          }
+        }
+      }
+    },
+    "Files in these folders are found only when AppFinder may access them.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Files in these folders are found only when AppFinder may access them."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只有允许 AppFinder 访问这些文件夹，才能搜到其中的文件。"
           }
         }
       }
@@ -150,6 +201,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开 AppFinder"
+          }
+        }
+      }
+    },
+    "Open Privacy Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Privacy Settings"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开隐私设置"
           }
         }
       }

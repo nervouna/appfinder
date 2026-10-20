@@ -12,6 +12,8 @@ import SwiftUI
     private(set) var message: String?
     private(set) var loginItemEnabled = LoginItem.isEnabled
     private(set) var loginItemNeedsApproval = LoginItem.requiresApproval
+    /// Whether AppFinder may read Desktop, Documents and Downloads (nil until checked).
+    private(set) var foldersAllowed: Bool?
     @ObservationIgnored private let hotkeys: HotkeyController
     @ObservationIgnored private var monitor: Any?
 
@@ -25,6 +27,21 @@ import SwiftUI
         shortcutText = hotkeys.shortcut.displayText
         loginItemEnabled = LoginItem.isEnabled
         loginItemNeedsApproval = LoginItem.requiresApproval
+        checkFolders()
+    }
+
+    /// Checks the protected folders off the main thread: the first check makes the system ask.
+    func checkFolders() {
+        DispatchQueue.global(qos: .utility).async {
+            let allowed = FolderAccess.check().isEmpty
+            DispatchQueue.main.async { [weak self] in
+                MainActor.assumeIsolated { self?.foldersAllowed = allowed }
+            }
+        }
+    }
+
+    func openPrivacySettings() {
+        NSWorkspace.shared.open(FolderAccess.privacySettings)
     }
 
     /// Starts recording: the global shortcut is suspended so that it can be pressed to record it again.
@@ -121,6 +138,21 @@ struct SettingsView: View {
                 get: { model.loginItemEnabled },
                 set: { model.setLoginItem($0) }
             ))
+            LabeledContent(String(localized: "Desktop, Documents and Downloads")) {
+                if model.foldersAllowed == false {
+                    Button(String(localized: "Open Privacy Settings")) {
+                        model.openPrivacySettings()
+                    }
+                } else if model.foldersAllowed == true {
+                    Text(String(localized: "Allowed"))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            if model.foldersAllowed == false {
+                Text(String(localized: "Files in these folders are found only when AppFinder may access them."))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
             if model.loginItemNeedsApproval {
                 Text(String(localized: "Allow AppFinder in System Settings → General → Login Items."))
                     .font(.callout)
@@ -168,6 +200,10 @@ struct SettingsView: View {
     }
 
     var isVisible: Bool { window?.isVisible == true }
+
+    func checkFolders() {
+        model.checkFolders()
+    }
 
     func close() {
         window?.close()
