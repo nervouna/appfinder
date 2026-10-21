@@ -14,8 +14,9 @@ import AppKit
         self.openPanel = openPanel
         self.openSettings = openSettings
         super.init()
-        let image = NSImage(systemSymbolName: "magnifyingglass", accessibilityDescription: "AppFinder")
-        image?.isTemplate = true
+        // A template image from the asset catalog (design/README.md), so the system tints it.
+        let image = NSImage(named: "MenuBarIcon")
+        image?.accessibilityDescription = "AppFinder"
         item.button?.image = image
         menu.delegate = self
         item.menu = menu

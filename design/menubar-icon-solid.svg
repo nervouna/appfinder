@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Menu bar glyph, candidate 3 (solid lens): 16 x 16 pt, black on transparent, 1 unit = 1 pt.
+       Lens: a solid disc around (7, 7), radius 7 (x and y 0-14), with candidate 1's A cut out of it.
+       Handle: 2 pt wide at 45 degrees, round end centred on (15, 15).
+       Letter: box x 3.5-10.5, y 3-10, flat apex x 6-8 on y 3-4, legs 1 pt thick, crossbar y 7-8.
+       The counter above the crossbar stays part of the disc. -->
+  <!-- One path, even-odd: disc and handle, the A inside it is a hole, the A's counter is filled again. -->
+  <path fill="#000" fill-rule="evenodd" d="M12.606 11.192L15.707 14.293A1 1 0 0 1 14.293 15.707L11.192 12.606A7 7 0 1 1 12.606 11.192ZM6 3H8L10.5 10H9.438L8.724 8H5.276L4.562 10H3.5ZM6.705 4H7.295L8.367 7H5.633Z"/>
+</svg>
