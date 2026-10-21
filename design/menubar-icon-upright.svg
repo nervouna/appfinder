@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Menu bar glyph, candidate 2 (upright A): 16 x 16 pt, black on transparent, 1 unit = 1 pt.
+       Lens and handle as candidate 1: ring around (7, 7), outer radius 7, inner radius 6; handle 2 pt wide
+       at 45 degrees, round end centred on (15, 15).
+       Letter: an A with upright legs, so every edge but the two top corners is on a whole point.
+       Box x 4-10, y 3-10. Legs x 4-5 and 9-10, top bar y 3-4, crossbar y 7-8.
+       Top corners: 2 pt radius outside, 1 pt inside (concentric). -->
+  <g fill="#000" fill-rule="evenodd">
+    <!-- Ring and handle: the outline of both, minus the inner disc. -->
+    <path d="M12.606 11.192L15.707 14.293A1 1 0 0 1 14.293 15.707L11.192 12.606A7 7 0 1 1 12.606 11.192ZM7 1A6 6 0 1 0 7 13A6 6 0 1 0 7 1Z"/>
+    <!-- A: outline minus the counter above the crossbar. -->
+    <path d="M4 10V5A2 2 0 0 1 6 3H8A2 2 0 0 1 10 5V10H9V8H5V10ZM5 7V5A1 1 0 0 1 6 4H8A1 1 0 0 1 9 5V7Z"/>
+  </g>
+</svg>
