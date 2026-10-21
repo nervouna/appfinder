@@ -15,7 +15,7 @@ let designDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent(
 /// `file` is an SVG in this folder, or "symbol:<name>" for an SF Symbol at its default size.
 let candidates: [(title: String, file: String, nativeHeight: Double)] = [
     ("Before: SF Symbol magnifyingglass", "symbol:magnifyingglass", 15),
-    ("Candidate 1: slanted A", "menubar-icon-slanted.svg", 16),
+    ("Candidate 1: slanted A, ships", "menubar-icon-slanted.svg", 16),
     ("Candidate 2: upright A", "menubar-icon-upright.svg", 16),
     ("Candidate 3: solid lens", "menubar-icon-solid.svg", 16),
 ]
