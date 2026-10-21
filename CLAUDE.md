@@ -47,7 +47,7 @@ Spotlight leaves files in Desktop, Documents and Downloads out of AppFinder's re
 - `scripts/install.sh [debug|release]` (default `release`) builds, replaces `/Applications/AppFinder.app` and launches it. It refuses ad-hoc builds.
 - `scripts/release.sh [--skip-notarize]` builds a Developer ID signed, notarized and stapled `build/release/AppFinder-<version>.zip`.
 - Signing settings are never committed: scripts source `${XDG_CONFIG_HOME:-$HOME/.config}/appfinder/signing.env` (`APPFINDER_CODESIGN_IDENTITY`, `APPFINDER_TEAM_ID`, `APPFINDER_NOTARY_*`). Never read or print the notary key files.
-- Icon: `scripts/make-icon.sh --draw` renders `design/icon.png` (`scripts/draw-icon.swift`) and regenerates `App/Assets.xcassets/AppIcon.appiconset`.
+- Icon: `App/AppIcon.icon` is an Icon Composer document (four SVG layers with light and dark colours) that Xcode compiles into `Assets.car` and `AppIcon.icns`; geometry, palette and the reasons in `design/README.md`. After changing it, `scripts/render-icon.sh` renders `design/icon-preview.png` (all appearances, with `ictool`), and `scripts/check-icon-render.sh` checks a Release build's icon and renders it as the system draws it.
 
 ## Debug control channel and the input source check
 

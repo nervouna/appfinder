@@ -45,3 +45,14 @@ load_signing_env() {
         die "APPFINDER_CODESIGN_IDENTITY is set but APPFINDER_TEAM_ID is not (see $SIGN_ENV_FILE)"
     fi
 }
+
+# The app icon: an Icon Composer document that Xcode compiles into Assets.car and AppIcon.icns.
+APP_ICON="$APPFINDER_ROOT/App/AppIcon.icon"
+
+# Compiles scripts/icon-tool.swift to build/icon-tool and sets ICON_TOOL to its path.
+build_icon_tool() {
+    ICON_TOOL="$BUILD_DIR/icon-tool"
+    mkdir -p "$BUILD_DIR"
+    swiftc -O "$APPFINDER_ROOT/scripts/icon-tool.swift" -o "$ICON_TOOL" \
+        || die "cannot compile scripts/icon-tool.swift"
+}
