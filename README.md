@@ -8,7 +8,6 @@
 
 A keyboard launcher for macOS that opens apps and files from the Spotlight index. While its panel is open the input source is ABC, so a Chinese input method never catches your search; when the panel closes, the input source you had before comes back.
 
-<!-- screenshots -->
 
 ## Status
 
