@@ -81,6 +81,20 @@ scripts/release.sh            # notarized zip in build/release/
 
 Signing settings live in `${XDG_CONFIG_HOME:-$HOME/.config}/appfinder/signing.env` and are never committed; `scripts/install.sh` refuses unsigned builds. See [CLAUDE.md](CLAUDE.md) for the architecture, the Debug control channel and the input source check, and [docs/design.md](docs/design.md) for the design.
 
+### Publish a release
+
+Update the version in `AppFinder.xcodeproj/project.pbxproj` and commit it first. Publishing requires a clean `main` branch, the signing and notarization settings above, and an authenticated GitHub CLI (`gh`). Then run:
+
+```sh
+scripts/release.sh --publish
+```
+
+This runs the tests, builds and verifies the notarized archive, creates the version tag, pushes `main` and the tag, and uploads the ZIP and its SHA-256 file to a draft GitHub Release. It publishes the draft only after checking the uploaded assets. Release notes are generated automatically; add `--notes-file /path/to/release-notes.md` to supply your own.
+
+If publishing is interrupted, rerun the same command at the same commit. Keep `build/release/`: its `release-commit`, ZIP and `.zip.sha256` files let the script reuse the verified archive and finish an incomplete draft without rebuilding or notarizing again. A draft that already has assets cannot be resumed without the matching local cache. Published releases and conflicting tags or assets are never overwritten.
+
+Without `--publish`, the script only prepares the local archive. `--skip-notarize` is for local packaging checks and cannot be combined with `--publish`.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
