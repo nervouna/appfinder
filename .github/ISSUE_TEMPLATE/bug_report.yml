@@ -1,0 +1,57 @@
+name: Bug report
+description: Something in AppFinder does not work as described
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you did and what went wrong. Log lines from Console (subsystem `io.damao.appfinder`) help.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: The search you typed, the app or file you expected, or the input method and the way you closed the panel.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The release (for example 0.1.2) or the commit you built.
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: macOS version
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options:
+        - Search results or ranking
+        - Input source switch
+        - Panel and keys
+        - Shortcut
+        - Settings or menu
+        - Launch at login or folder access
+        - Build scripts
+        - Docs
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested fix
+      description: Optional. If you know where the cause is, say so.

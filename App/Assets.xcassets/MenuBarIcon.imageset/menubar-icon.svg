@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Menu bar glyph, candidate 1 (slanted A): 16 x 16 pt, black on transparent, 1 unit = 1 pt.
+       Lens: ring around (7, 7), outer radius 7 (x and y 0-14), inner radius 6, so it is 1 pt wide.
+       Handle: 2 pt wide at 45 degrees from the ring to a round end whose centre is (15, 15).
+       Letter: the app icon's A, 1 pt lines. Box x 3.5-10.5, y 3-10, 0.5 above the lens centre.
+       Flat apex x 6-8 on y 3-4, legs 1 pt thick, crossbar y 7-8, feet end on y = 10. -->
+  <g fill="#000" fill-rule="evenodd">
+    <!-- Ring and handle: the outline of both, minus the inner disc. -->
+    <path d="M12.606 11.192L15.707 14.293A1 1 0 0 1 14.293 15.707L11.192 12.606A7 7 0 1 1 12.606 11.192ZM7 1A6 6 0 1 0 7 13A6 6 0 1 0 7 1Z"/>
+    <!-- A: outline minus the counter above the crossbar. -->
+    <path d="M6 3H8L10.5 10H9.438L8.724 8H5.276L4.562 10H3.5ZM6.705 4H7.295L8.367 7H5.633Z"/>
+  </g>
+</svg>

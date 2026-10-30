@@ -49,6 +49,7 @@ Spotlight leaves files in Desktop, Documents and Downloads out of AppFinder's re
 - `scripts/release.sh [--skip-notarize]` builds a Developer ID signed, notarized and stapled `build/release/AppFinder-<version>.zip`.
 - Signing settings are never committed: scripts source `${XDG_CONFIG_HOME:-$HOME/.config}/appfinder/signing.env` (`APPFINDER_CODESIGN_IDENTITY`, `APPFINDER_TEAM_ID`, `APPFINDER_NOTARY_*`). Never read or print the notary key files.
 - Icon: `App/AppIcon.icon` is an Icon Composer document (four SVG layers with light and dark colours) that Xcode compiles into `Assets.car` and `AppIcon.icns`; geometry, palette and the reasons in `design/README.md`. After changing it, `scripts/render-icon.sh` renders `design/icon-preview.png` (all appearances, with `ictool`), and `scripts/check-icon-render.sh` checks a Release build's icon and renders it as the system draws it.
+- Menu bar glyph: the status item shows `MenuBarIcon` from `App/Assets.xcassets`, a black-on-transparent SVG on a 16 pt grid (the app icon's magnifier with the A, 1 pt lines on whole points), compiled as a template image with its vector data kept. Its source is `design/menubar-icon-slanted.svg`; the drawing rules, the other candidates and the check are in `design/README.md`. After changing it, `swift design/render-menubar-preview.swift` renders `design/menubar-preview.png`.
 
 ## Debug control channel and the input source check
 
