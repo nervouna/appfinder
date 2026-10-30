@@ -13,7 +13,8 @@
 # un-notarized app, to rehearse everything except the upload. That archive is not
 # fit for distribution.
 # --publish also pushes the current main commit and its version tag, uploads the
-# verified archive and checksum to a draft GitHub Release, then publishes it.
+# verified archive and checksum to a draft GitHub Release, then publishes it and
+# installs that same archive in /Applications, restarting the app.
 #
 # The notary API key is passed to notarytool by path and is never read here. The
 # issuer ID is read into a variable that is never printed.
@@ -426,6 +427,13 @@ if $publish; then
     check_release
     [[ "$release_draft" == true ]] || die "draft $tag disappeared before publication"
     gh release edit "$tag" --repo "$repo" --draft=false --verify-tag
-    release_url="$(gh release view "$tag" --repo "$repo" --json url --jq .url)"
+    release_url="https://github.com/$repo/releases/tag/$tag"
     echo "Release: $release_url"
+
+    log "Installing published $tag and restarting $APP_NAME"
+    if ! "$SCRIPT_DIR/install.sh" --archive "$archive"; then
+        log "$tag is already published at $release_url; local installation or restart failed."
+        printf 'Retry installation only: %q --archive %q\n' "$SCRIPT_DIR/install.sh" "$archive" >&2
+        exit 1
+    fi
 fi

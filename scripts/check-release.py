@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Exercise release packaging and publication offline, using a real local Git remote.
 
-The script under test is unchanged. Only signing, notarization, GitHub and the build
-are simulated at their command-line boundaries; ZIPs, hashes and Git refs are real.
-No developer credentials are read and no command contacts GitHub or Apple.
+The script under test is unchanged. Signing, notarization, GitHub, building and
+installation are simulated at their command-line boundaries; ZIPs, hashes and Git
+refs are real. No developer credentials are read, no command contacts GitHub or
+Apple, and the installed application and its process are never touched.
 
 Usage: python3 scripts/check-release.py
 """
@@ -28,7 +29,7 @@ VERSION = "0.1.3"
 TAG = "v" + VERSION
 ARCHIVE = "AppFinder-" + VERSION + ".zip"
 REPO = "fixture/appfinder"
-TOOLS = {"git", "gh", "security", "codesign", "xcrun", "spctl", "swift", "fixture-build"}
+TOOLS = {"git", "gh", "security", "codesign", "xcrun", "spctl", "swift", "fixture-build", "fixture-install"}
 
 
 def fake_tool(name, args):
@@ -66,6 +67,13 @@ def fake_tool(name, args):
         (contents / "MacOS/AppFinder").write_text("fixture build " + str(state["builds"]))
         if state.get("edit_during_build"):
             (work / "feature.txt").write_text("changed during build")
+    elif name == "fixture-install":
+        if len(args) != 2 or args[0] != "--archive":
+            return fail("Unexpected installer arguments: " + repr(args))
+        state["events"].append(["install", state["release"]["draft"] if state["release"] else None])
+        if state.get("fail_install"):
+            return fail("fixture installation failure")
+        shutil.copyfile(args[1], state_path.parent / "installed.zip")
     elif name == "security":
         print('1) 0000000000 "Developer ID Application: Fixture"')
     elif name == "codesign":
@@ -156,6 +164,8 @@ def fake_tool(name, args):
                 return fail("Unexpected release view fields: " + fields)
         elif args[:2] == ["release", "edit"]:
             if "--draft=false" in args:
+                if state.get("reject_publish"):
+                    return fail("fixture publication failure")
                 state["events"].append(["publish", sorted(state["release"]["assets"])])
                 state["release"]["draft"] = False
             else:
@@ -191,6 +201,9 @@ class ReleaseWorkflowTests(unittest.TestCase):
         build = self.work / "scripts/build.sh"
         build.write_text('#!/bin/bash\nexec fixture-build "$@"\n')
         build.chmod(0o755)
+        installer = self.work / "scripts/install.sh"
+        installer.write_text('#!/bin/bash\nexec fixture-install "$@"\n')
+        installer.chmod(0o755)
         project = self.work / "AppFinder.xcodeproj"
         project.mkdir()
         (project / "project.pbxproj").write_text(("MARKETING_VERSION = " + VERSION + ";\n") * 4)
@@ -272,7 +285,9 @@ class ReleaseWorkflowTests(unittest.TestCase):
         checksum = (self.root / "assets" / (ARCHIVE + ".sha256")).read_text().split()
         self.assertEqual(checksum, [hashlib.sha256(archive).hexdigest(), ARCHIVE])
         self.assertEqual(state["events"][0], ["create", True])
-        self.assertEqual(state["events"][-1], ["publish", expected_assets])
+        self.assertEqual(state["events"][-2:], [["publish", expected_assets], ["install", False]])
+        self.assertEqual((self.root / "installed.zip").read_bytes(), archive)
+        self.assertEqual(state["builds"], 1)
 
     def test_resumes_upload_without_rebuilding_or_overwriting(self):
         self.state(fail_upload_at=2)
@@ -281,6 +296,7 @@ class ReleaseWorkflowTests(unittest.TestCase):
         state = self.state()
         self.assertTrue(state["release"]["draft"])
         self.assertEqual(state["release"]["assets"], [ARCHIVE])
+        self.assertFalse(any(event[0] == "install" for event in state["events"]))
         first_archive = (self.root / "assets" / ARCHIVE).read_bytes()
 
         # A valid hash cannot establish that a cached package has the intended version.
@@ -362,13 +378,31 @@ class ReleaseWorkflowTests(unittest.TestCase):
                 if dirty.exists():
                     dirty.unlink()
 
-    def test_download_mismatch_keeps_release_private(self):
-        self.state(corrupt_download=True)
+    def test_download_or_publication_failure_prevents_installation(self):
+        for failure, diagnostic in (("corrupt_download", "differs from"),
+                                    ("reject_publish", "fixture publication failure")):
+            with self.subTest(failure=failure):
+                self.state(corrupt_download=failure == "corrupt_download", reject_publish=failure == "reject_publish")
+                result = self.run_release("--publish", succeeds=False)
+                self.assertIn(diagnostic, result.stderr)
+                state = self.state()
+                self.assertTrue(state["release"]["draft"])
+                self.assertFalse(any(event[0] in ("publish", "install") for event in state["events"]))
+
+    def test_installation_failure_preserves_published_release(self):
+        self.state(fail_install=True)
         result = self.run_release("--publish", succeeds=False)
-        self.assertIn("differs from", result.stderr)
         state = self.state()
-        self.assertTrue(state["release"]["draft"])
-        self.assertFalse(any(event[0] == "publish" for event in state["events"]))
+        expected_assets = sorted([ARCHIVE, ARCHIVE + ".sha256"])
+        self.assertFalse(state["release"]["draft"])
+        self.assertEqual(sorted(state["release"]["assets"]), expected_assets)
+        self.assertEqual(state["events"][-2:], [["publish", expected_assets], ["install", False]])
+        self.assertEqual(self.git("rev-parse", "refs/tags/" + TAG + "^{}", remote=True), self.head)
+        self.assertIn("fixture installation failure", result.stderr)
+        self.assertIn("published", result.stderr)
+        self.assertIn("local installation or restart failed", result.stderr)
+        self.assertIn("install.sh --archive", result.stderr)
+        self.assertIn(str(self.work / "build/release" / ARCHIVE), result.stderr)
 
     def test_source_change_or_notary_rejection_prevents_pushing(self):
         for failure, diagnostic in (("edit_during_build", "uncommitted changes"),

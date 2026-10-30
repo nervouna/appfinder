@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Builds the app, replaces /Applications/AppFinder.app and launches it.
+# Builds the app or installs a published archive, replaces /Applications/AppFinder.app
+# and launches it.
 #
-# Usage: scripts/install.sh [debug|release]   (default: release)
+# Usage: scripts/install.sh [debug|release] | --archive ZIP   (default: release)
 #
 # Only a Debug build hosts the control server that appfinderctl talks to.
 #
-# The login item and any permission the user grants are tied to the bundle ID and the
-# signing identity, so only a build signed with the configured identity may be
-# installed. Without one this script refuses before it builds or touches /Applications.
+# Built apps use the configured signing identity. Published archives need no local
+# signing configuration, but must be Developer ID signed, notarized and stapled.
 
 set -euo pipefail
 
@@ -16,46 +16,68 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 source "$SCRIPT_DIR/common.sh"
 
 usage() {
-    echo "Usage: scripts/install.sh [debug|release]" >&2
+    echo "Usage: scripts/install.sh [debug|release] | --archive ZIP" >&2
 }
 
-if [[ $# -gt 1 ]]; then
-    usage
-    exit 2
-fi
-
+archive=""
 case "${1:-release}" in
-    debug | release) configuration="${1:-release}" ;;
+    debug | release)
+        [[ $# -le 1 ]] || { usage; exit 2; }
+        configuration="${1:-release}"
+        ;;
+    --archive)
+        [[ $# -eq 2 && -n "${2:-}" ]] || die "--archive requires a ZIP file path"
+        archive="$2"
+        [[ -f "$archive" && -r "$archive" ]] || die "release archive is not readable: $archive"
+        ;;
+    -h | --help)
+        usage
+        exit 0
+        ;;
     *)
         usage
         exit 2
         ;;
 esac
 
-load_signing_env
+if [[ -z "$archive" ]]; then
+    load_signing_env
 
-if [[ -z "$SIGN_IDENTITY" ]]; then
-    die "no signing identity configured, refusing to install an ad-hoc build over $INSTALLED_APP.
+    if [[ -z "$SIGN_IDENTITY" ]]; then
+        die "no signing identity configured, refusing to install an ad-hoc build over $INSTALLED_APP.
 Set APPFINDER_CODESIGN_IDENTITY and APPFINDER_TEAM_ID in $SIGN_ENV_FILE
 (or point APPFINDER_SIGNING_ENV at a file that sets them)."
-fi
+    fi
 
-"$SCRIPT_DIR/build.sh" "$configuration"
-
-built_app="$BUILD_DIR/$APP_NAME.app"
-if codesign -dv "$built_app" 2>&1 | grep -q '^Signature=adhoc'; then
-    die "$built_app is ad-hoc signed, refusing to install it"
+    "$SCRIPT_DIR/build.sh" "$configuration"
 fi
 
 # Stage next to the destination so that the final step is a single rename.
 staging="$(mktemp -d "/Applications/.$APP_NAME-install.XXXXXX")"
 trap 'rm -rf "$staging"' EXIT
-ditto "$built_app" "$staging/$APP_NAME.app"
-codesign --verify --strict --deep "$staging/$APP_NAME.app"
+if [[ -n "$archive" ]]; then
+    log "Unpacking $archive"
+    ditto -x -k "$archive" "$staging"
+else
+    ditto "$BUILD_DIR/$APP_NAME.app" "$staging/$APP_NAME.app"
+fi
+built_app="$staging/$APP_NAME.app"
+[[ -d "$built_app" ]] || die "release archive $archive does not contain $APP_NAME.app"
+codesign --verify --strict --deep "$built_app"
+details="$(codesign -dvv "$built_app" 2>&1)"
+if grep -q '^Signature=adhoc' <<<"$details"; then
+    die "$built_app is ad-hoc signed, refusing to install it"
+fi
+if [[ -n "$archive" ]]; then
+    grep -q '^Authority=Developer ID Application' <<<"$details" \
+        || die "$archive is not signed with a Developer ID Application certificate"
+    xcrun stapler validate "$built_app" || die "notarization ticket validation failed for $archive"
+    spctl --assess --type execute "$built_app" || die "Gatekeeper rejected $archive"
+fi
 
 # LaunchServices lists the app by this ID; read it here, before anything is quit or replaced.
 bundle_id="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$staging/$APP_NAME.app/Contents/Info.plist" 2>/dev/null || true)"
-[[ -n "$bundle_id" ]] || die "$built_app has no CFBundleIdentifier"
+[[ "$bundle_id" == io.damao.appfinder ]] || die "$built_app has bundle ID '$bundle_id', expected io.damao.appfinder"
 
 if pgrep -x "$APP_NAME" >/dev/null; then
     log "Quitting running $APP_NAME"
