@@ -4,7 +4,7 @@
 ![macOS 26+](https://img.shields.io/badge/macOS-26%2B-lightgrey)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<!-- banner -->
+![AppFinder](docs/images/banner.jpg)
 
 A keyboard launcher for macOS that opens apps and files from the Spotlight index. While its panel is open the input source is ABC, so a Chinese input method never catches your search; when the panel closes, the input source you had before comes back.
 
