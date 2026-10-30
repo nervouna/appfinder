@@ -12,6 +12,7 @@ Personal project, single user. Write commits, docs and comments in English; Conv
 4. Fuzzy matching, ranked by match quality plus a usage boost (decaying use count and the queries that led to an item).
 5. Enter opens, Cmd+Enter reveals in Finder, Esc closes, Up/Down and Ctrl+P/Ctrl+N move. A click elsewhere closes.
 6. ABC lock and restore, every time, also from and back to a third-party Chinese input method.
+7. Basic arithmetic in the search field, evaluated locally. The first result displays the full equation. Enter copies its result, Cmd+Enter copies the equation, and both close the panel. App and file rows retain their existing key actions.
 
 Non-goals: extensions, commands, clipboard, AI, window switching, web search, an own file index, Mac App Store.
 
@@ -19,7 +20,7 @@ Non-goals: extensions, commands, clipboard, AI, window switching, web search, an
 
 - Swift 6, AppKit panel, SwiftUI Settings. Minimum macOS 26. Not sandboxed, hardened runtime. Bundle ID `io.damao.appfinder`.
 - `Package.swift`:
-  - `AppFinderCore`: pure logic, unit tested. `SearchKey` (folded name with word starts), `FuzzyMatcher` (optimal alignment, fzf v2 style), `Pinyin` (system transliteration plus a table of polyphonic readings, `alternateReadings`), `SearchItem`, `Ranker`, `UsageBook`, `Shortcut`, `FileFilter`.
+  - `AppFinderCore`: pure logic, unit tested. `SearchKey` (folded name with word starts), `FuzzyMatcher` (optimal alignment, fzf v2 style), `Pinyin` (system transliteration plus a table of polyphonic readings, `alternateReadings`), `SearchItem`, `Ranker`, `UsageBook`, `Shortcut`, `FileFilter`, `Calculator` (decimal arithmetic and expression parsing).
   - `AppFinderSystem`: `TISInputSources` and `InputSourceLock`, `CarbonHotkey`, `AppCatalog` (live `NSMetadataQuery`), `FileSearch` (`MDQuery` on a serial queue), `UsageStore` (`~/Library/Application Support/AppFinder/usage.json`), `LoginItem`.
   - `AppFinderControl`: the Debug control channel (`CFMessagePort`). `appfinderctl`: its command line client.
 - `AppFinder.xcodeproj` (file-system-synchronized groups, edited by hand, no generators): the app (`App/`) and the Debug-only test app `AppFinderFixture` (`Fixture/`). `AppFinderControl` is linked into the app in Debug only (build-only dependency plus `OTHER_LDFLAGS`), and all control code is under `#if DEBUG`; a Release binary must not contain it.

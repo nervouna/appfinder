@@ -1,10 +1,19 @@
 import AppFinderCore
 import AppKit
 
-/// A row of the result list: a section header or an item.
+/// A row of the result list: a section header, an item, or a calculation.
 enum ResultRow: Equatable {
     case header(String)
     case item(RankedItem)
+    case calculation(Calculator.Evaluation)
+
+    var selectionID: String? {
+        switch self {
+        case .header: nil
+        case .item(let item): item.id
+        case .calculation: nil
+        }
+    }
 
     var item: RankedItem? {
         if case .item(let item) = self { return item }
@@ -118,6 +127,65 @@ final class ResultCellView: NSTableCellView {
         if folder == home { return "~" }
         if folder.hasPrefix(home + "/") { return "~" + folder.dropFirst(home.count) }
         return folder
+    }
+}
+
+final class CalculatorCellView: NSTableCellView {
+    static let identifier = NSUserInterfaceItemIdentifier("calculation")
+    private let equation = NSTextField(labelWithString: "")
+    private let hint = NSTextField(labelWithString: "")
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        identifier = Self.identifier
+        equation.font = .monospacedDigitSystemFont(ofSize: 22, weight: .medium)
+        equation.lineBreakMode = .byTruncatingMiddle
+        equation.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        hint.font = .systemFont(ofSize: 11)
+        hint.textColor = .secondaryLabelColor
+        hint.stringValue = String(localized: "↩ Copy result    ⌘↩ Copy equation")
+
+        let text = NSStackView(views: [equation, hint])
+        text.orientation = .vertical
+        text.alignment = .leading
+        text.spacing = 5
+        text.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(text)
+        NSLayoutConstraint.activate([
+            text.leadingAnchor.constraint(equalTo: leadingAnchor, constant: ResultRowView.inset + 10),
+            text.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -(ResultRowView.inset + 12)),
+            text.centerYAnchor.constraint(equalTo: centerYAnchor),
+        ])
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError() }
+
+    func show(_ calculation: Calculator.Evaluation) {
+        switch calculation {
+        case .result(let result):
+            let title = NSMutableAttributedString(string: result.equation, attributes: [
+                .font: NSFont.monospacedDigitSystemFont(ofSize: 22, weight: .medium),
+                .foregroundColor: NSColor.labelColor,
+            ])
+            let valueLength = (result.value as NSString).length
+            title.addAttribute(.font, value: NSFont.monospacedDigitSystemFont(ofSize: 22, weight: .semibold),
+                               range: NSRange(location: title.length - valueLength, length: valueLength))
+            equation.attributedStringValue = title
+            hint.isHidden = false
+            toolTip = result.equation
+        case .failure(let failure):
+            let message = switch failure {
+            case .divisionByZero: String(localized: "Cannot divide by zero")
+            case .outOfRange: String(localized: "Number is outside the supported range")
+            }
+            equation.attributedStringValue = NSAttributedString(string: message, attributes: [
+                .font: NSFont.systemFont(ofSize: 18, weight: .medium),
+                .foregroundColor: NSColor.secondaryLabelColor,
+            ])
+            hint.isHidden = true
+            toolTip = message
+        }
     }
 }
 

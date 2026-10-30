@@ -12,7 +12,7 @@ AppFinder is a keyboard launcher for macOS that opens apps and files. It replace
 6. Launch at login, no Dock icon, a menu bar item (Open, Settings, Quit).
 7. The hotkey is configurable in a small Settings window, which also has the launch-at-login switch.
 
-Non-goals for v0.1: extensions, commands, calculator, clipboard history, AI, window switching, web search, a custom file index, Mac App Store distribution.
+Non-goals for v0.1: extensions, commands, clipboard history, AI, window switching, web search, a custom file index, Mac App Store distribution.
 
 ## Default hotkey
 
@@ -46,6 +46,13 @@ The panel, its views and the app catalog exist from launch on. The hotkey handle
 - Fuzzy scoring: subsequence match, case and diacritic insensitive, with bonuses for a match at the start, at word boundaries (space, `-`, `_`, `.`, camelCase) and for consecutive characters, and penalties for gaps.
 - Usage boost: every open from AppFinder is recorded (item, time, the query typed) in `~/Library/Application Support/AppFinder/usage.json`. The rank adds a frecency term (count with a half-life of about two weeks) and a stronger term when the current query is a prefix of a query that previously led to the item.
 
+### Calculator
+
+- Arithmetic is evaluated locally as the query changes, with no prefix or mode switch. Supports the four basic operations (`+`, `-`, `*`, `/`, `×`, `÷`), parentheses, decimal numbers, unary signs and whitespace, with conventional precedence. A lone number remains a search query.
+- A complete equation such as `1+2*3=7` appears in a 64 pt calculation row with no icon or selection fill, above any matching apps and files. The 22 pt equation and smaller secondary shortcut hints align with the section heading. The displayed and copied equation omits whitespace while preserving the typed numbers, operators and parentheses. Parsing still validates the original input, so whitespace cannot merge separate numbers into a valid expression. With no app or file selected, Enter copies only the result and Cmd+Enter copies the equation. Both close through the existing input-source restore path. Down selects the first app or file; Up from that first item returns to the unselected calculation state. App and file rows retain their open and reveal actions. Asynchronous search updates preserve the current selection, including the calculation's no-selection state. Cmd+C still copies selected search-field text.
+- Incomplete or invalid expressions do not retain a previous result. Complete expressions that divide by zero or exceed the supported numeric range show an error and cannot be copied. They do not automatically select an app or file below the error.
+- Decimal arithmetic avoids binary floating-point tails such as `0.1+0.2=0.30000000000000004`. Results omit redundant trailing zeros and retain Decimal's available precision; display and clipboard use the same value. No calculation history is stored.
+
 ### ABC lock and restore
 
 Facts on this Mac: the current source is InkFlow (`io.damao.inputmethod.inkflow.Hans`), ABC (`com.apple.keylayout.ABC`) is enabled, and "Automatically switch to a document's input source" is on (`TextInputGlobalPropertyPerContextInput = 1`), so the system itself remembers an input source per text context.
@@ -69,3 +76,4 @@ The owner approved the scope above on 2026-10-21 and decided the open questions:
 1. **Pinyin matching**: app names match pinyin and pinyin initials (`jisuanqi`, `jsq` → 计算器), precomputed with `CFStringTransform` whenever the catalog changes. File names do not (that would need an own index of file names). English names match through `kMDItemAlternateNames` either way.
 2. **Default hotkey**: ⌘E, as Raycast today.
 3. **Distribution**: Developer ID signed and notarized releases (`scripts/release.sh`), private GitHub repository.
+4. **Calculator (2026-10-31)**: show the full equation, Enter copies the result, Cmd+Enter copies the equation, and both close the panel. Start with basic arithmetic. The final result layout has no icon or selection fill, uses a larger equation and subdued shortcut hints, and displays and copies equations without whitespace.

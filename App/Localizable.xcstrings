@@ -103,6 +103,40 @@
         }
       }
     },
+    "Calculator": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calculator"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "计算器"
+          }
+        }
+      }
+    },
+    "Cannot divide by zero": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot divide by zero"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不能除以零"
+          }
+        }
+      }
+    },
     "Desktop, Documents and Downloads": {
       "extractionState": "manual",
       "localizations": {
@@ -184,6 +218,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "登录时打开"
+          }
+        }
+      }
+    },
+    "Number is outside the supported range": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Number is outside the supported range"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数值超出可计算范围"
           }
         }
       }
@@ -354,6 +405,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "请按快捷键…"
+          }
+        }
+      }
+    },
+    "↩ Copy result    ⌘↩ Copy equation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "↩ Copy result    ⌘↩ Copy equation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "↩ 复制结果    ⌘↩ 复制完整算式"
           }
         }
       }

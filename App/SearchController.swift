@@ -9,7 +9,7 @@ import QuartzCore
 /// ABC lock (see `docs/design.md`, "ABC lock and restore").
 @MainActor final class SearchController: NSObject {
     enum CloseReason: String {
-        case escape, hotkey, focusLost, opened, revealed, command
+        case escape, hotkey, focusLost, opened, revealed, copied, command
     }
 
     /// How the input source is handed back on close; the defaults are what measurement settled on.
@@ -42,6 +42,7 @@ import QuartzCore
     private(set) var rows: [ResultRow] = []
     private var appResults: [RankedItem] = []
     private var fileResults: [RankedItem] = []
+    private var calculation: Calculator.Evaluation?
     private var fileTask: Task<Void, Never>?
     private(set) var isOpen = false
     private(set) var isClosing = false
@@ -57,6 +58,7 @@ import QuartzCore
 
     static let fieldHeight: CGFloat = 56
     static let rowHeight: CGFloat = 44
+    static let calculationHeight: CGFloat = 64
     static let headerHeight: CGFloat = 26
     static let visibleItemRows: CGFloat = 8
     static let appLimit = 6
@@ -117,6 +119,7 @@ import QuartzCore
         table.style = .plain
         table.backgroundColor = .clear
         table.selectionHighlightStyle = .regular
+        table.allowsEmptySelection = true
         table.intercellSpacing = NSSize(width: 0, height: 0)
         table.refusesFirstResponder = true
         table.floatsGroupRows = false
@@ -150,7 +153,15 @@ import QuartzCore
 
     /// The height of all rows; the list grows with it up to `maxListHeight`, and only scrolls beyond.
     private var contentHeight: CGFloat {
-        rows.reduce(0) { $0 + ($1.item == nil ? Self.headerHeight : Self.rowHeight) }
+        rows.reduce(0) { $0 + height(for: $1) }
+    }
+
+    private func height(for row: ResultRow) -> CGFloat {
+        switch row {
+        case .header: Self.headerHeight
+        case .item: Self.rowHeight
+        case .calculation: Self.calculationHeight
+        }
     }
 
     private static let maxListHeight = rowHeight * visibleItemRows + headerHeight
@@ -327,7 +338,7 @@ import QuartzCore
         case kVK_Escape:
             close(.escape)
         case kVK_Return, kVK_ANSI_KeypadEnter:
-            activateSelection(reveal: flags == .command)
+            activateSelection(alternate: flags == .command)
         case kVK_DownArrow:
             moveSelection(by: 1)
         case kVK_UpArrow:
@@ -361,9 +372,17 @@ import QuartzCore
     }
 
     private func moveSelection(by step: Int) {
-        let itemRows = rows.indices.filter { rows[$0].item != nil }
-        guard !itemRows.isEmpty else { return }
-        let current = itemRows.firstIndex(of: table.selectedRow) ?? 0
+        let itemRows = rows.indices.filter { rows[$0].selectionID != nil }
+        guard let first = itemRows.first else { return }
+        guard let current = itemRows.firstIndex(of: table.selectedRow) else {
+            if step > 0 || calculation == nil { select(row: first) }
+            return
+        }
+        if step < 0, current == 0, calculation != nil {
+            table.deselectAll(nil)
+            table.scrollRowToVisible(0)
+            return
+        }
         let next = itemRows[max(0, min(itemRows.count - 1, current + step))]
         select(row: next)
     }
@@ -374,18 +393,42 @@ import QuartzCore
     }
 
     @objc private func doubleClicked() {
-        guard table.clickedRow >= 0, rows.indices.contains(table.clickedRow), rows[table.clickedRow].item != nil else { return }
+        guard rows.indices.contains(table.clickedRow) else { return }
+        if case .calculation = rows[table.clickedRow] {
+            table.deselectAll(nil)
+            activateSelection(alternate: false)
+            return
+        }
+        guard rows[table.clickedRow].selectionID != nil else { return }
         select(row: table.clickedRow)
-        activateSelection(reveal: false)
+        activateSelection(alternate: false)
+    }
+
+    private var selectedRow: ResultRow? {
+        rows.indices.contains(table.selectedRow) ? rows[table.selectedRow] : nil
     }
 
     var selectedItem: RankedItem? {
-        rows.indices.contains(table.selectedRow) ? rows[table.selectedRow].item : nil
+        selectedRow?.item
     }
 
-    /// Opens the selected item (Enter) or shows it in Finder (Cmd+Enter), after the panel closed
-    /// and the input source is back.
-    func activateSelection(reveal: Bool) {
+    /// Enter copies a calculation's result or opens an item. Cmd+Enter copies the full equation
+    /// or reveals the item in Finder. Every successful action closes through the source restore path.
+    func activateSelection(alternate: Bool) {
+        if selectedItem == nil, let calculation {
+            guard case .result(let result) = calculation else {
+                NSSound.beep()
+                return
+            }
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            guard pasteboard.setString(alternate ? result.equation : result.value, forType: .string) else {
+                NSSound.beep()
+                return
+            }
+            close(.copied)
+            return
+        }
         guard let ranked = selectedItem else {
             NSSound.beep()
             return
@@ -400,8 +443,8 @@ import QuartzCore
         usage.record(path: item.path, query: field.stringValue)
         let url = URL(fileURLWithPath: item.path)
         let log = log
-        close(reveal ? .revealed : .opened) {
-            if reveal {
+        close(alternate ? .revealed : .opened) {
+            if alternate {
                 NSWorkspace.shared.activateFileViewerSelecting([url])
             } else if item.kind == .app {
                 let configuration = NSWorkspace.OpenConfiguration()
@@ -429,12 +472,13 @@ import QuartzCore
 
     private func catalogChanged() {
         guard isOpen, !isClosing else { return }
-        queryChanged()
+        queryChanged(keepSelection: true)
     }
 
-    func queryChanged() {
+    func queryChanged(keepSelection: Bool = false) {
         let query = field.stringValue
         fileTask?.cancel()
+        calculation = Calculator.evaluate(query)
         guard !query.trimmingCharacters(in: .whitespaces).isEmpty else {
             showRecent()
             return
@@ -443,7 +487,7 @@ import QuartzCore
         appResults = Ranker.rank(catalog.items, query: query, usage: usage.book, now: now, limit: Self.appLimit)
         // Keep the files found so far while they still match, so that the list does not flicker.
         fileResults = Ranker.rank(fileResults.map(\.item), query: query, usage: usage.book, now: now, limit: Self.fileLimit)
-        rebuildRows(keepSelection: false)
+        rebuildRows(keepSelection: keepSelection)
         scheduleFileSearch(query)
     }
 
@@ -465,6 +509,7 @@ import QuartzCore
     private func showRecent() {
         appResults = []
         fileResults = []
+        calculation = nil
         let apps = Dictionary(catalog.items.map { ($0.path, $0) }, uniquingKeysWith: { first, _ in first })
         var recent: [RankedItem] = []
         for path in usage.book.mostUsed(limit: Self.recentLimit * 3, now: Date()) where recent.count < Self.recentLimit {
@@ -480,8 +525,11 @@ import QuartzCore
     }
 
     private func rebuildRows(keepSelection: Bool) {
-        let selected = keepSelection ? selectedItem?.id : nil
+        let selected = keepSelection ? selectedRow?.selectionID : nil
         var rows: [ResultRow] = []
+        if let calculation {
+            rows += [.header(String(localized: "Calculator")), .calculation(calculation)]
+        }
         if !appResults.isEmpty {
             rows.append(.header(String(localized: "Applications")))
             rows += appResults.map(ResultRow.item)
@@ -496,13 +544,16 @@ import QuartzCore
 
     private func reloadTable(selecting id: String?) {
         table.reloadData()
-        let kept = id.flatMap { id in rows.firstIndex { $0.item?.id == id } }
-        let target = kept ?? rows.firstIndex { $0.item != nil }
+        let kept = id.flatMap { id in rows.firstIndex { $0.selectionID == id } }
+        let target = kept ?? (calculation == nil ? rows.firstIndex { $0.selectionID != nil } : nil)
         resizeToRows()
         if let target {
             table.selectRowIndexes(IndexSet(integer: target), byExtendingSelection: false)
             // A new list starts at the top, with its first header in view.
             table.scrollRowToVisible(kept == nil ? 0 : target)
+        } else {
+            table.deselectAll(nil)
+            if !rows.isEmpty { table.scrollRowToVisible(0) }
         }
     }
 
@@ -542,13 +593,19 @@ import QuartzCore
             "query": field.stringValue,
             "selectedText": (field.currentEditor()?.selectedRange).map { NSStringFromRange($0) } ?? NSNull(),
             "listScrolls": scroll.hasVerticalScroller,
-            "selected": selectedItem?.item.path ?? NSNull(),
+            "selected": selectedRow?.selectionID ?? NSNull(),
             "rows": rows.map { row -> [String: Any] in
                 switch row {
                 case .header(let title): ["header": title]
                 case .item(let ranked): [
                     "kind": ranked.item.kind.rawValue, "name": ranked.item.displayName,
                     "path": ranked.item.path, "score": ranked.total,
+                ]
+                case .calculation(.result(let result)): [
+                    "kind": "calculation", "name": result.equation, "result": result.value,
+                ]
+                case .calculation(.failure(let failure)): [
+                    "kind": "calculation", "error": String(describing: failure),
                 ]
                 }
             },
@@ -593,11 +650,14 @@ extension SearchController: NSTableViewDataSource, NSTableViewDelegate {
     }
 
     func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
-        rows[row].item == nil ? Self.headerHeight : Self.rowHeight
+        height(for: rows[row])
     }
 
     func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
-        rows[row].item != nil
+        if case .calculation = rows[row] {
+            tableView.deselectAll(nil)
+        }
+        return rows[row].selectionID != nil
     }
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
@@ -615,6 +675,11 @@ extension SearchController: NSTableViewDataSource, NSTableViewDelegate {
             let view = tableView.makeView(withIdentifier: ResultCellView.identifier, owner: nil) as? ResultCellView
                 ?? ResultCellView(frame: .zero)
             view.show(ranked, icon: icons.icon(for: ranked.item.path))
+            return view
+        case .calculation(let calculation):
+            let view = tableView.makeView(withIdentifier: CalculatorCellView.identifier, owner: nil) as? CalculatorCellView
+                ?? CalculatorCellView(frame: .zero)
+            view.show(calculation)
             return view
         }
     }
